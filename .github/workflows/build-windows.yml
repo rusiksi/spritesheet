@@ -1,0 +1,44 @@
+name: Build & Release EXE
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pyinstaller
+          if exist requirements.txt pip install -r requirements.txt
+
+      - name: Build .exe
+        run: |
+          pyinstaller --onefile --noconfirm spritesheet.py
+
+      - name: Create ZIP
+        run: |
+          mkdir release
+          copy dist\spritesheet.exe release\
+          powershell Compress-Archive -Path release\* -DestinationPath spritesheet.zip
+
+      - name: Upload release to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Auto Release - ${{ github.run_number }}"
+          tag_name: "v${{ github.run_number }}"
+          files: your_script.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
