@@ -39,6 +39,6 @@ jobs:
         with:
           name: "Auto Release - ${{ github.run_number }}"
           tag_name: "v${{ github.run_number }}"
-          files: your_script.zip
+          files: spritesheet.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
